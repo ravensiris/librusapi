@@ -32,6 +32,10 @@ refresh every *3h* or so.
         print(lu)
   #+end_src
 
+* Documentation
+
+Docs can be found [[https://ravensiris.github.io/librusapi/][here]]
+
 * Working on the project
 
   #+begin_src sh
