@@ -4,6 +4,11 @@ Goal of this project is to free students from the limitations of Librus Synergia
 mainly: giving the user *fresh* information unlike their mobile app that can only
 refresh every *3h* or so.
 
+* Install
+  #+begin_src sh
+  pip install librusapi
+  #+end_src
+
 * Tech used
 - written in =python= developed with =3.9= in mind
 - =requests= library for fetching data, mainly html
@@ -39,6 +44,8 @@ refresh every *3h* or so.
   # Installing as an editable library
   pip install -e .
   #+end_src
+
+  #+RESULTS:
 
 Now you can import =librusapi= in your project
 
