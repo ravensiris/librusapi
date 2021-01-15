@@ -1,0 +1,6 @@
+__pycache__
+tests.json
+venv
+.vscode
+*.egg-info
+dist
