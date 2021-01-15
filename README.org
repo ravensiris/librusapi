@@ -1,0 +1,56 @@
+* librusapi - A Librus Synergia scraper
+
+Goal of this project is to free students from the limitations of Librus Synergia software
+mainly: giving the user *fresh* information unlike their mobile app that can only
+refresh every *3h* or so.
+
+* Tech used
+- written in =python= developed with =3.9= in mind
+- =requests= library for fetching data, mainly html
+- =BeautifulSoup4= library for parsing the data
+** Development specific
+- =mypy= for type checking
+- =pytest= for running tests
+- =pdoc= for creating html documentation
+
+* Quick start
+  Example usage of the API
+** Getting the timetable
+  #+begin_src python
+    from librusapi.token import get_token
+    from librusapi import timetable
+
+    token = get_token('username', 'password')
+    lesson_units = timetable.lesson_units(token)
+
+    for lu in lesson_units:
+        print(lu)
+  #+end_src
+
+* Working on the project
+
+  #+begin_src sh
+  git clone 
+  cd librusapi
+  python -m venv venv
+  # This may be different depending on your operating system and shell
+  source ./venv/bin/activate
+  pip install -r requirements.txt
+  # Installing as an editable library
+  pip install -e .
+  #+end_src
+
+Now you can import =librusapi= in your project
+
+** Generating docs
+   #+begin_src sh
+   pdoc --html librusapi
+   #+end_src
+
+* Status
+
+Currenty you can:
+
+- Authenticate and get a token
+- List all lessons in a timetable
+

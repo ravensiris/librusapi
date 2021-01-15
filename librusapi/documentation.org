@@ -1,0 +1,18 @@
+* Currently supported features
+
+- Authorizing using Librus username and password (check `librusapi.token`)
+- Getting lesson units on your timetable (check `librusapi.timetable`)
+
+* Quick start
+
+Minimal implementation of getting your timetable
+  #+begin_src python
+    from librusapi.token import get_token
+    from librusapi import timetable
+
+    token = get_token('username', 'password')
+    lesson_units = timetable.lesson_units(token)
+
+    for lu in lesson_units:
+        print(lu)
+  #+end_src

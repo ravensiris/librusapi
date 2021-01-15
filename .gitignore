@@ -4,3 +4,6 @@ venv
 .vscode
 *.egg-info
 dist
+html
+.mypy_cache
+*~

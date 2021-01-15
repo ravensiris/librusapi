@@ -10,15 +10,25 @@ from typing import Tuple, Optional, Iterator, Union
 
 
 class Week:
-    """Container for a week"""
+    """Container for a week.
+
+    Use it with str() to get the YYYY-MM-DD_YYYY-MM-DD representation
+    used in librus timetable requests.
+
+    Attributes:
+        start: Any day in a week. Will be automatically changed to a Monday.
+        end: End of the week.
+    """
 
     def __init__(self, start: datetime):
         if start.weekday() != 0:
             start = start - timedelta(days=start.weekday())
         self.start = start
+        """Start of the week."""
 
     @cached_property
     def end(self) -> datetime:
+        """End of the week."""
         return self.start + timedelta(days=6)
 
     @cached_property
@@ -33,28 +43,50 @@ class Week:
 @total_ordering
 @dataclass
 class LessonUnit:
-    """Single lesson on a timetable"""
+    """Stores a single unit on a timetable.
+
+    You can use comparisons to determine which lesson starts first.
+
+    Attributes:
+        name: Lesson's name.
+        teacher: Teacher's full name.
+        classroom: Class' room string.
+        info: Additional info attached to a unit.
+            Can be for example: 'dzien wolny od szkoly', 'zastepstwo'
+        start: Full `datetime` of lesson's start time
+        duration: Duration in `timedelta`
+        week: `Week` of the lesson
+
+    """
 
     name: str
+    """Lesson's name"""
     teacher: str
+    """Teacher's full name."""
     classroom: str
+    """ Class' room."""
     info: Optional[str]
+    """Additional info attached to a unit. """
     start: datetime
+    """Full `datetime` of lesson's start time"""
     duration: timedelta
+    """Lesson's duration"""
 
     def __lt__(self, other):
-        """Compares dates"""
+        """Compares dates of units"""
         if not isinstance(other, LessonUnit):
             return NotImplemented
         return self.start < other.start
 
     def __eq__(self, other):
+        """Compares dates of units"""
         if not isinstance(other, LessonUnit):
             return NotImplemented
         return self.start == other.start
 
     @cached_property
     def week(self):
+        """`Week` of the lesson"""
         return Week(self.start)
 
 
@@ -64,7 +96,6 @@ def _get_html(token: str, week: Week) -> str:
     cookies = {"DZIENNIKSID": token}
     r = s.post(TIMETABLE_URL, data=data, cookies=cookies, headers=HEADERS)
     r.raise_for_status()
-    print(r.text)
     return r.text
 
 
@@ -135,12 +166,39 @@ def _parse_html(html: str) -> Iterator[LessonUnit]:
 def lesson_units(
     token: str, week: Optional[Union[datetime, Week]] = datetime.now()
 ) -> Iterator[LessonUnit]:
-    """List all lesson units in no particular order"""
+    """Generator for lesson units.
+
+    Retrieves HTML and then parses it using Beautifulsoup.
+
+    Args:
+        token: Librus token.
+            Can be retrieved from `librusapi.token.get_token`.
+        week: Determines which week will be fetched from librus
+            Either a `Week` or any day which will be converted to `Week`.
+            Defaults to `datetime.now()`
+    Returns:
+        Generator of `LessonUnit` that parses one instance at a time.
+        Results are unordered.
+    Raises:
+        requests.exceptions.HTTPError: When an error that is
+            unrelated to authenticaiton occurs.
+        AuthorizationError: When authorization using the token fails.
+    Example:
+    >>> lesson_units = lesson_units('TOKEN')
+    >>> for lu in lesson_units:
+    ...     print(lu.name, lu.teacher, lu.classroom, lu.info, lu.start, lu.duration, sep='\\n')
+    ...     break
+    Math
+    John Smith
+    111
+    None
+    2021-01-11 08:00:00
+    0:45:00
+    """
+    if not week:
+        week = datetime.now()
+
     if isinstance(week, datetime):
         week = Week(week)
-    elif not isinstance(week, Week):
-        raise TypeError(
-            f"week of type: {type(week)} is not allowed. Can be either datetime or core.Week"
-        )
     html = _get_html(token, week)
     return _parse_html(html)

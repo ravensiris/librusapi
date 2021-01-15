@@ -5,29 +5,36 @@ from librusapi.exceptions import AuthorizationError
 import typing
 from typing import Dict
 from librusapi.urls import HEADERS
-
-URLS = {
-    "base_api": (baseapi := "https://api.librus.pl/"),
-    "auth": {
-        "_client_id": (client_id := "?client_id=46"),
-        "base": (baseauth := urljoin(baseapi, "OAuth/*")),
-        "authorization": urljoin(baseauth, "Authorization" + client_id),
-        "grant": urljoin(baseauth, "Authorization/Grant" + client_id),
-    },
-}
+from librusapi.urls import API_URLS
 
 
-def get_token(login: str, _pass: str):
-    """Get DZIENNIKSID cookie that acts as an authorization token"""
+def get_token(login: str, password: str):
+    """Get DZIENNIKSID cookie that acts as an authorization token.
+
+    Args:
+        login: Full Librus username.
+        password: Librus password.
+    Returns:
+        string DZIENNIKSID cookie.
+    Raises:
+        AuthorizationError: Whenever anything fails.
+
+    Example:
+    >>> get_token('username', 'password')
+    Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    """
     s = Session()
     s.headers = HEADERS
     s.get(
-        url="https://api.librus.pl/OAuth/Authorization?\
-                client_id=46&response_type=code&scope=mydata"
+        url=typing.cast(
+            str, typing.cast(Dict[str, dict], API_URLS["auth"])["handshake"]
+        )
     )
     resp = s.post(
-        typing.cast(str, typing.cast(Dict[str, dict], URLS["auth"])["authorization"]),
-        data={"action": "login", "login": login, "pass": _pass},
+        typing.cast(
+            str, typing.cast(Dict[str, dict], API_URLS["auth"])["authorization"]
+        ),
+        data={"action": "login", "login": login, "pass": password},
     )
 
     try:
@@ -40,7 +47,7 @@ def get_token(login: str, _pass: str):
         raise AuthorizationError("\n".join(error_messages))
 
     if (goTo := json.get("goTo")):
-        s.get(urljoin(typing.cast(str, URLS["base_api"]), goTo))
+        s.get(urljoin(typing.cast(str, API_URLS["base_api"]), goTo))
     else:
         raise AuthorizationError("'goTo' was not provided in the response JSON")
 
