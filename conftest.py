@@ -2,7 +2,7 @@
 Example: {"username":"123456u", "password": "password123"}"""
 
 import pytest
-from core.token import get_token
+from librusapi.token import get_token
 from json import load
 
 pytest_plugins = ("mypy", "flake8")

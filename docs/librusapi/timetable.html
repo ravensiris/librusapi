@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>librusapi.timetable API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>librusapi.timetable</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from librusapi.urls import TIMETABLE_URL, HEADERS
+from librusapi.exceptions import AuthorizationError
+from requests import Session
+from bs4 import BeautifulSoup as bs  # type: ignore
+from bs4.element import Tag  # type: ignore
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+from functools import total_ordering, cached_property
+from typing import Tuple, Optional, Iterator, Union
+
+
+class Week:
+    &#34;&#34;&#34;Container for a week.
+
+    Use it with str() to get the YYYY-MM-DD_YYYY-MM-DD representation
+    used in librus timetable requests.
+
+    Attributes:
+        start: Any day in a week. Will be automatically changed to a Monday.
+        end: End of the week.
+    &#34;&#34;&#34;
+
+    def __init__(self, start: datetime):
+        if start.weekday() != 0:
+            start = start - timedelta(days=start.weekday())
+        self.start = start
+        &#34;&#34;&#34;Start of the week.&#34;&#34;&#34;
+
+    @cached_property
+    def end(self) -&gt; datetime:
+        &#34;&#34;&#34;End of the week.&#34;&#34;&#34;
+        return self.start + timedelta(days=6)
+
+    @cached_property
+    def ___str__(self):
+        fmt = &#34;%Y-%m-%d&#34;
+        return self.start.strftime(fmt) + &#34;_&#34; + self.end.strftime(fmt)
+
+    def __str__(self):
+        return self.___str__
+
+
+@total_ordering
+@dataclass
+class LessonUnit:
+    &#34;&#34;&#34;Stores a single unit on a timetable.
+
+    You can use comparisons to determine which lesson starts first.
+
+    Attributes:
+        name: Lesson&#39;s name.
+        teacher: Teacher&#39;s full name.
+        classroom: Class&#39; room string.
+        info: Additional info attached to a unit.
+            Can be for example: &#39;dzien wolny od szkoly&#39;, &#39;zastepstwo&#39;
+        start: Full `datetime` of lesson&#39;s start time
+        duration: Duration in `timedelta`
+        week: `Week` of the lesson
+
+    &#34;&#34;&#34;
+
+    name: str
+    &#34;&#34;&#34;Lesson&#39;s name&#34;&#34;&#34;
+    teacher: str
+    &#34;&#34;&#34;Teacher&#39;s full name.&#34;&#34;&#34;
+    classroom: str
+    &#34;&#34;&#34; Class&#39; room.&#34;&#34;&#34;
+    info: Optional[str]
+    &#34;&#34;&#34;Additional info attached to a unit. &#34;&#34;&#34;
+    start: datetime
+    &#34;&#34;&#34;Full `datetime` of lesson&#39;s start time&#34;&#34;&#34;
+    duration: timedelta
+    &#34;&#34;&#34;Lesson&#39;s duration&#34;&#34;&#34;
+
+    def __lt__(self, other):
+        &#34;&#34;&#34;Compares dates of units&#34;&#34;&#34;
+        if not isinstance(other, LessonUnit):
+            return NotImplemented
+        return self.start &lt; other.start
+
+    def __eq__(self, other):
+        &#34;&#34;&#34;Compares dates of units&#34;&#34;&#34;
+        if not isinstance(other, LessonUnit):
+            return NotImplemented
+        return self.start == other.start
+
+    @cached_property
+    def week(self):
+        &#34;&#34;&#34;`Week` of the lesson&#34;&#34;&#34;
+        return Week(self.start)
+
+
+def _get_html(token: str, week: Week) -&gt; str:
+    s = Session()
+    data = {&#34;tydzien&#34;: str(week)}
+    cookies = {&#34;DZIENNIKSID&#34;: token}
+    r = s.post(TIMETABLE_URL, data=data, cookies=cookies, headers=HEADERS)
+    r.raise_for_status()
+    return r.text
+
+
+def _process_entry_text(et: Tag) -&gt; Tuple[str, str, str]:
+    &#34;&#34;&#34;Process the &#39;text&#39; part of a lesson unit html&#34;&#34;&#34;
+
+    def _sanitize(text):
+        &#34;&#34;&#34;Remove all newlines and &gt;1 spaces in a line of text&#34;&#34;&#34;
+        return &#34; &#34;.join(text.replace(&#34;\xa0&#34;, &#34; &#34;).replace(&#34;&amp;nbsp&#34;, &#34;&#34;).split())
+
+    text_data = et.find_all(text=True)
+    # remove unnecessary newlines found
+    if len(text_data) == 4:
+        del text_data[0]
+        del text_data[1]
+    class_name, teacher_and_classroom = text_data
+    teacher_and_classroom = _sanitize(teacher_and_classroom)
+    teacher, classroom = teacher_and_classroom.split(&#34; s. &#34;)
+    teacher = _sanitize(teacher[1:])
+    class_name = _sanitize(class_name)
+    return class_name, classroom, teacher
+
+
+def _process_entry_time(e: Tag) -&gt; Tuple[datetime, timedelta, Optional[str]]:
+    def _parse_time(time: str):
+        &#34;&#34;&#34;Parse a HH:MM string to datetime&#34;&#34;&#34;
+        return datetime.strptime(time, &#34;%H:%M&#34;)
+
+    day = e.attrs.get(&#34;data-date&#34;)
+    time_from = _parse_time(e.attrs.get(&#34;data-time_from&#34;))
+    time_to = _parse_time(e.attrs.get(&#34;data-time_to&#34;))
+    info = e.find(&#34;div&#34;, attrs={&#34;class&#34;: &#34;plan-lekcji-info&#34;})
+    if info:
+        info = info.text
+    start = datetime.strptime(day, &#34;%Y-%m-%d&#34;) + timedelta(
+        hours=time_from.hour, minutes=time_from.minute
+    )
+    duration = time_to - time_from
+    return start, duration, info
+
+
+def _process_entry(e: Tag, et: Tag) -&gt; LessonUnit:
+    start, duration, info = _process_entry_time(e)
+    class_name, classroom, teacher = _process_entry_text(et)
+    return LessonUnit(
+        name=class_name,
+        teacher=teacher,
+        classroom=classroom,
+        start=start,
+        duration=duration,
+        info=info,
+    )
+
+
+def _parse_html(html: str) -&gt; Iterator[LessonUnit]:
+    doc = bs(html, &#34;lxml&#34;)
+    no_access = doc.find(&#34;h2&#34;)
+    if no_access and no_access.text == &#34;Brak dostępu&#34;:
+        raise AuthorizationError(&#34;Token invalid or expired.&#34;)
+    entries = doc.find_all(&#34;td&#34;, {&#34;id&#34;: &#34;timetableEntryBox&#34;})
+    for e in entries:
+        et = e.find(&#34;div&#34;, attrs={&#34;class&#34;: &#34;text&#34;})
+        if not et:
+            continue
+        yield _process_entry(e, et)
+
+
+def lesson_units(
+    token: str, week: Optional[Union[datetime, Week]] = datetime.now()
+) -&gt; Iterator[LessonUnit]:
+    &#34;&#34;&#34;Generator for lesson units.
+
+    Retrieves HTML and then parses it using Beautifulsoup.
+
+    Args:
+        token: Librus token.
+            Can be retrieved from `librusapi.token.get_token`.
+        week: Determines which week will be fetched from librus
+            Either a `Week` or any day which will be converted to `Week`.
+            Defaults to `datetime.now()`
+    Returns:
+        Generator of `LessonUnit` that parses one instance at a time.
+        Results are unordered.
+    Raises:
+        requests.exceptions.HTTPError: When an error that is
+            unrelated to authenticaiton occurs.
+        AuthorizationError: When authorization using the token fails.
+    Example:
+    &gt;&gt;&gt; lesson_units = lesson_units(&#39;TOKEN&#39;)
+    &gt;&gt;&gt; for lu in lesson_units:
+    ...     print(lu.name, lu.teacher, lu.classroom, lu.info, lu.start, lu.duration, sep=&#39;\\n&#39;)
+    ...     break
+    Math
+    John Smith
+    111
+    None
+    2021-01-11 08:00:00
+    0:45:00
+    &#34;&#34;&#34;
+    if not week:
+        week = datetime.now()
+
+    if isinstance(week, datetime):
+        week = Week(week)
+    html = _get_html(token, week)
+    return _parse_html(html)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="librusapi.timetable.lesson_units"><code class="name flex">
+<span>def <span class="ident">lesson_units</span></span>(<span>token: str, week: Union[datetime.datetime, <a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a>, NoneType] = datetime.datetime(2021, 1, 15, 19, 56, 47, 919444)) ‑> Iterator[<a title="librusapi.timetable.LessonUnit" href="#librusapi.timetable.LessonUnit">LessonUnit</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator for lesson units.</p>
+<p>Retrieves HTML and then parses it using Beautifulsoup.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>token</code></strong></dt>
+<dd>Librus token.
+Can be retrieved from <code><a title="librusapi.token.get_token" href="token.html#librusapi.token.get_token">get_token()</a></code>.</dd>
+<dt><strong><code>week</code></strong></dt>
+<dd>Determines which week will be fetched from librus
+Either a <code><a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a></code> or any day which will be converted to <code><a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a></code>.
+Defaults to <code>datetime.now()</code></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Generator of <code><a title="librusapi.timetable.LessonUnit" href="#librusapi.timetable.LessonUnit">LessonUnit</a></code> that parses one instance at a time.
+Results are unordered.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>requests.exceptions.HTTPError</code></dt>
+<dd>When an error that is
+unrelated to authenticaiton occurs.</dd>
+<dt><code>AuthorizationError</code></dt>
+<dd>When authorization using the token fails.</dd>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; lesson_units = lesson_units('TOKEN')
+&gt;&gt;&gt; for lu in lesson_units:
+...     print(lu.name, lu.teacher, lu.classroom, lu.info, lu.start, lu.duration, sep='\n')
+...     break
+Math
+John Smith
+111
+None
+2021-01-11 08:00:00
+0:45:00
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def lesson_units(
+    token: str, week: Optional[Union[datetime, Week]] = datetime.now()
+) -&gt; Iterator[LessonUnit]:
+    &#34;&#34;&#34;Generator for lesson units.
+
+    Retrieves HTML and then parses it using Beautifulsoup.
+
+    Args:
+        token: Librus token.
+            Can be retrieved from `librusapi.token.get_token`.
+        week: Determines which week will be fetched from librus
+            Either a `Week` or any day which will be converted to `Week`.
+            Defaults to `datetime.now()`
+    Returns:
+        Generator of `LessonUnit` that parses one instance at a time.
+        Results are unordered.
+    Raises:
+        requests.exceptions.HTTPError: When an error that is
+            unrelated to authenticaiton occurs.
+        AuthorizationError: When authorization using the token fails.
+    Example:
+    &gt;&gt;&gt; lesson_units = lesson_units(&#39;TOKEN&#39;)
+    &gt;&gt;&gt; for lu in lesson_units:
+    ...     print(lu.name, lu.teacher, lu.classroom, lu.info, lu.start, lu.duration, sep=&#39;\\n&#39;)
+    ...     break
+    Math
+    John Smith
+    111
+    None
+    2021-01-11 08:00:00
+    0:45:00
+    &#34;&#34;&#34;
+    if not week:
+        week = datetime.now()
+
+    if isinstance(week, datetime):
+        week = Week(week)
+    html = _get_html(token, week)
+    return _parse_html(html)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="librusapi.timetable.LessonUnit"><code class="flex name class">
+<span>class <span class="ident">LessonUnit</span></span>
+<span>(</span><span>name: str, teacher: str, classroom: str, info: Optional[str], start: datetime.datetime, duration: datetime.timedelta)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stores a single unit on a timetable.</p>
+<p>You can use comparisons to determine which lesson starts first.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Lesson's name.</dd>
+<dt><strong><code>teacher</code></strong></dt>
+<dd>Teacher's full name.</dd>
+<dt><strong><code>classroom</code></strong></dt>
+<dd>Class' room string.</dd>
+<dt><strong><code>info</code></strong></dt>
+<dd>Additional info attached to a unit.
+Can be for example: 'dzien wolny od szkoly', 'zastepstwo'</dd>
+<dt><strong><code>start</code></strong></dt>
+<dd>Full <code>datetime</code> of lesson's start time</dd>
+<dt><strong><code>duration</code></strong></dt>
+<dd>Duration in <code>timedelta</code></dd>
+<dt><strong><code>week</code></strong></dt>
+<dd><code><a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a></code> of the lesson</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@total_ordering
+@dataclass
+class LessonUnit:
+    &#34;&#34;&#34;Stores a single unit on a timetable.
+
+    You can use comparisons to determine which lesson starts first.
+
+    Attributes:
+        name: Lesson&#39;s name.
+        teacher: Teacher&#39;s full name.
+        classroom: Class&#39; room string.
+        info: Additional info attached to a unit.
+            Can be for example: &#39;dzien wolny od szkoly&#39;, &#39;zastepstwo&#39;
+        start: Full `datetime` of lesson&#39;s start time
+        duration: Duration in `timedelta`
+        week: `Week` of the lesson
+
+    &#34;&#34;&#34;
+
+    name: str
+    &#34;&#34;&#34;Lesson&#39;s name&#34;&#34;&#34;
+    teacher: str
+    &#34;&#34;&#34;Teacher&#39;s full name.&#34;&#34;&#34;
+    classroom: str
+    &#34;&#34;&#34; Class&#39; room.&#34;&#34;&#34;
+    info: Optional[str]
+    &#34;&#34;&#34;Additional info attached to a unit. &#34;&#34;&#34;
+    start: datetime
+    &#34;&#34;&#34;Full `datetime` of lesson&#39;s start time&#34;&#34;&#34;
+    duration: timedelta
+    &#34;&#34;&#34;Lesson&#39;s duration&#34;&#34;&#34;
+
+    def __lt__(self, other):
+        &#34;&#34;&#34;Compares dates of units&#34;&#34;&#34;
+        if not isinstance(other, LessonUnit):
+            return NotImplemented
+        return self.start &lt; other.start
+
+    def __eq__(self, other):
+        &#34;&#34;&#34;Compares dates of units&#34;&#34;&#34;
+        if not isinstance(other, LessonUnit):
+            return NotImplemented
+        return self.start == other.start
+
+    @cached_property
+    def week(self):
+        &#34;&#34;&#34;`Week` of the lesson&#34;&#34;&#34;
+        return Week(self.start)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="librusapi.timetable.LessonUnit.classroom"><code class="name">var <span class="ident">classroom</span> : str</code></dt>
+<dd>
+<div class="desc"><p>Class' room.</p></div>
+</dd>
+<dt id="librusapi.timetable.LessonUnit.duration"><code class="name">var <span class="ident">duration</span> : datetime.timedelta</code></dt>
+<dd>
+<div class="desc"><p>Lesson's duration</p></div>
+</dd>
+<dt id="librusapi.timetable.LessonUnit.info"><code class="name">var <span class="ident">info</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"><p>Additional info attached to a unit.</p></div>
+</dd>
+<dt id="librusapi.timetable.LessonUnit.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"><p>Lesson's name</p></div>
+</dd>
+<dt id="librusapi.timetable.LessonUnit.start"><code class="name">var <span class="ident">start</span> : datetime.datetime</code></dt>
+<dd>
+<div class="desc"><p>Full <code>datetime</code> of lesson's start time</p></div>
+</dd>
+<dt id="librusapi.timetable.LessonUnit.teacher"><code class="name">var <span class="ident">teacher</span> : str</code></dt>
+<dd>
+<div class="desc"><p>Teacher's full name.</p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="librusapi.timetable.LessonUnit.week"><code class="name">var <span class="ident">week</span></code></dt>
+<dd>
+<div class="desc"><p><code><a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a></code> of the lesson</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner=None):
+    if instance is None:
+        return self
+    if self.attrname is None:
+        raise TypeError(
+            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
+    try:
+        cache = instance.__dict__
+    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+        msg = (
+            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
+            f&#34;instance to cache {self.attrname!r} property.&#34;
+        )
+        raise TypeError(msg) from None
+    val = cache.get(self.attrname, _NOT_FOUND)
+    if val is _NOT_FOUND:
+        with self.lock:
+            # check if another thread filled cache while we awaited lock
+            val = cache.get(self.attrname, _NOT_FOUND)
+            if val is _NOT_FOUND:
+                val = self.func(instance)
+                try:
+                    cache[self.attrname] = val
+                except TypeError:
+                    msg = (
+                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
+                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
+                    )
+                    raise TypeError(msg) from None
+    return val</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="librusapi.timetable.Week"><code class="flex name class">
+<span>class <span class="ident">Week</span></span>
+<span>(</span><span>start: datetime.datetime)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Container for a week.</p>
+<p>Use it with str() to get the YYYY-MM-DD_YYYY-MM-DD representation
+used in librus timetable requests.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>start</code></strong></dt>
+<dd>Any day in a week. Will be automatically changed to a Monday.</dd>
+<dt><strong><code>end</code></strong></dt>
+<dd>End of the week.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Week:
+    &#34;&#34;&#34;Container for a week.
+
+    Use it with str() to get the YYYY-MM-DD_YYYY-MM-DD representation
+    used in librus timetable requests.
+
+    Attributes:
+        start: Any day in a week. Will be automatically changed to a Monday.
+        end: End of the week.
+    &#34;&#34;&#34;
+
+    def __init__(self, start: datetime):
+        if start.weekday() != 0:
+            start = start - timedelta(days=start.weekday())
+        self.start = start
+        &#34;&#34;&#34;Start of the week.&#34;&#34;&#34;
+
+    @cached_property
+    def end(self) -&gt; datetime:
+        &#34;&#34;&#34;End of the week.&#34;&#34;&#34;
+        return self.start + timedelta(days=6)
+
+    @cached_property
+    def ___str__(self):
+        fmt = &#34;%Y-%m-%d&#34;
+        return self.start.strftime(fmt) + &#34;_&#34; + self.end.strftime(fmt)
+
+    def __str__(self):
+        return self.___str__</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="librusapi.timetable.Week.end"><code class="name">var <span class="ident">end</span></code></dt>
+<dd>
+<div class="desc"><p>End of the week.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner=None):
+    if instance is None:
+        return self
+    if self.attrname is None:
+        raise TypeError(
+            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
+    try:
+        cache = instance.__dict__
+    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+        msg = (
+            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
+            f&#34;instance to cache {self.attrname!r} property.&#34;
+        )
+        raise TypeError(msg) from None
+    val = cache.get(self.attrname, _NOT_FOUND)
+    if val is _NOT_FOUND:
+        with self.lock:
+            # check if another thread filled cache while we awaited lock
+            val = cache.get(self.attrname, _NOT_FOUND)
+            if val is _NOT_FOUND:
+                val = self.func(instance)
+                try:
+                    cache[self.attrname] = val
+                except TypeError:
+                    msg = (
+                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
+                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
+                    )
+                    raise TypeError(msg) from None
+    return val</code></pre>
+</details>
+</dd>
+<dt id="librusapi.timetable.Week.start"><code class="name">var <span class="ident">start</span></code></dt>
+<dd>
+<div class="desc"><p>Start of the week.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="librusapi" href="index.html">librusapi</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="librusapi.timetable.lesson_units" href="#librusapi.timetable.lesson_units">lesson_units</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="librusapi.timetable.LessonUnit" href="#librusapi.timetable.LessonUnit">LessonUnit</a></code></h4>
+<ul class="two-column">
+<li><code><a title="librusapi.timetable.LessonUnit.classroom" href="#librusapi.timetable.LessonUnit.classroom">classroom</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.duration" href="#librusapi.timetable.LessonUnit.duration">duration</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.info" href="#librusapi.timetable.LessonUnit.info">info</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.name" href="#librusapi.timetable.LessonUnit.name">name</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.start" href="#librusapi.timetable.LessonUnit.start">start</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.teacher" href="#librusapi.timetable.LessonUnit.teacher">teacher</a></code></li>
+<li><code><a title="librusapi.timetable.LessonUnit.week" href="#librusapi.timetable.LessonUnit.week">week</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a></code></h4>
+<ul class="">
+<li><code><a title="librusapi.timetable.Week.end" href="#librusapi.timetable.Week.end">end</a></code></li>
+<li><code><a title="librusapi.timetable.Week.start" href="#librusapi.timetable.Week.start">start</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

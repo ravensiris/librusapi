@@ -30,7 +30,7 @@ refresh every *3h* or so.
 * Working on the project
 
   #+begin_src sh
-  git clone 
+  git clone https://github.com/ravensiris/librusapi
   cd librusapi
   python -m venv venv
   # This may be different depending on your operating system and shell

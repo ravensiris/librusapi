@@ -1,4 +1,4 @@
-from core import timetable
+from librusapi import timetable
 from datetime import datetime, timedelta
 
 

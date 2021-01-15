@@ -7,3 +7,4 @@ dist
 html
 .mypy_cache
 *~
+*\#*
