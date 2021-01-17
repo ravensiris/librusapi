@@ -1,3 +1,15 @@
+* Table of contents                                                     :TOC:
+- [[#librusapi---a-librus-synergia-scraper][librusapi - A Librus Synergia scraper]]
+- [[#install][Install]]
+- [[#tech-used][Tech used]]
+  - [[#development-specific][Development specific]]
+- [[#quick-start][Quick start]]
+  - [[#getting-the-timetable][Getting the timetable]]
+- [[#documentation][Documentation]]
+- [[#working-on-the-project][Working on the project]]
+  - [[#generating-docs][Generating docs]]
+- [[#status][Status]]
+
 * librusapi - A Librus Synergia scraper
 
 Goal of this project is to free students from the limitations of Librus Synergia software

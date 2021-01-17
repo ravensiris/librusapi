@@ -6,5 +6,5 @@ All of this is archieved using the `requests`
 library for fetching data and `BeaufifulSoup4`
 for scraping the data
 
-.. include:: ./documentation.md
+.. include:: ../README-pypi.rst
 """
