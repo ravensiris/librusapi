@@ -91,7 +91,7 @@ class LessonUnit:
     &#34;&#34;&#34;Lesson&#39;s name&#34;&#34;&#34;
     teacher: str
     &#34;&#34;&#34;Teacher&#39;s full name.&#34;&#34;&#34;
-    classroom: str
+    classroom: Optional[str]
     &#34;&#34;&#34; Class&#39; room.&#34;&#34;&#34;
     info: Optional[str]
     &#34;&#34;&#34;Additional info attached to a unit. &#34;&#34;&#34;
@@ -127,7 +127,7 @@ def _get_html(token: str, week: Week) -&gt; str:
     return r.text
 
 
-def _process_entry_text(et: Tag) -&gt; Tuple[str, str, str]:
+def _process_entry_text(et: Tag) -&gt; Tuple[str, Optional[str], str]:
     &#34;&#34;&#34;Process the &#39;text&#39; part of a lesson unit html&#34;&#34;&#34;
 
     def _sanitize(text):
@@ -141,8 +141,13 @@ def _process_entry_text(et: Tag) -&gt; Tuple[str, str, str]:
         del text_data[1]
     class_name, teacher_and_classroom = text_data
     teacher_and_classroom = _sanitize(teacher_and_classroom)
-    teacher, classroom = teacher_and_classroom.split(&#34; s. &#34;)
-    teacher = _sanitize(teacher[1:])
+    if &#34; s. &#34; in teacher_and_classroom:
+        teacher, classroom = teacher_and_classroom.split(&#34; s. &#34;)
+        teacher = teacher[1:]
+    else:
+        teacher = teacher_and_classroom
+        classroom = None
+    teacher = _sanitize(teacher)
     class_name = _sanitize(class_name)
     return class_name, classroom, teacher
 
@@ -240,7 +245,7 @@ def lesson_units(
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="librusapi.timetable.lesson_units"><code class="name flex">
-<span>def <span class="ident">lesson_units</span></span>(<span>token: str, week: Union[datetime.datetime, <a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a>, NoneType] = datetime.datetime(2021, 1, 17, 18, 53, 19, 269582)) ‑> Iterator[<a title="librusapi.timetable.LessonUnit" href="#librusapi.timetable.LessonUnit">LessonUnit</a>]</span>
+<span>def <span class="ident">lesson_units</span></span>(<span>token: str, week: Union[datetime.datetime, <a title="librusapi.timetable.Week" href="#librusapi.timetable.Week">Week</a>, NoneType] = datetime.datetime(2021, 2, 3, 13, 2, 12, 87675)) ‑> Iterator[<a title="librusapi.timetable.LessonUnit" href="#librusapi.timetable.LessonUnit">LessonUnit</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Generator for lesson units.</p>
@@ -330,7 +335,7 @@ None
 <dl>
 <dt id="librusapi.timetable.LessonUnit"><code class="flex name class">
 <span>class <span class="ident">LessonUnit</span></span>
-<span>(</span><span>name: str, teacher: str, classroom: str, info: Optional[str], start: datetime.datetime, duration: datetime.timedelta)</span>
+<span>(</span><span>name: str, teacher: str, classroom: Optional[str], info: Optional[str], start: datetime.datetime, duration: datetime.timedelta)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Stores a single unit on a timetable.</p>
@@ -380,7 +385,7 @@ class LessonUnit:
     &#34;&#34;&#34;Lesson&#39;s name&#34;&#34;&#34;
     teacher: str
     &#34;&#34;&#34;Teacher&#39;s full name.&#34;&#34;&#34;
-    classroom: str
+    classroom: Optional[str]
     &#34;&#34;&#34; Class&#39; room.&#34;&#34;&#34;
     info: Optional[str]
     &#34;&#34;&#34;Additional info attached to a unit. &#34;&#34;&#34;
@@ -408,7 +413,7 @@ class LessonUnit:
 </details>
 <h3>Class variables</h3>
 <dl>
-<dt id="librusapi.timetable.LessonUnit.classroom"><code class="name">var <span class="ident">classroom</span> : str</code></dt>
+<dt id="librusapi.timetable.LessonUnit.classroom"><code class="name">var <span class="ident">classroom</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"><p>Class' room.</p></div>
 </dd>

@@ -5,7 +5,7 @@ import pytest
 from librusapi.token import get_token
 from json import load
 
-pytest_plugins = ("mypy", "flake8")
+#pytest_plugins = ("mypy", "flake8")
 
 
 @pytest.fixture(scope="session")

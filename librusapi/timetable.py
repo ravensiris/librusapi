@@ -63,7 +63,7 @@ class LessonUnit:
     """Lesson's name"""
     teacher: str
     """Teacher's full name."""
-    classroom: str
+    classroom: Optional[str]
     """ Class' room."""
     info: Optional[str]
     """Additional info attached to a unit. """
@@ -99,7 +99,7 @@ def _get_html(token: str, week: Week) -> str:
     return r.text
 
 
-def _process_entry_text(et: Tag) -> Tuple[str, str, str]:
+def _process_entry_text(et: Tag) -> Tuple[str, Optional[str], str]:
     """Process the 'text' part of a lesson unit html"""
 
     def _sanitize(text):
@@ -113,8 +113,13 @@ def _process_entry_text(et: Tag) -> Tuple[str, str, str]:
         del text_data[1]
     class_name, teacher_and_classroom = text_data
     teacher_and_classroom = _sanitize(teacher_and_classroom)
-    teacher, classroom = teacher_and_classroom.split(" s. ")
-    teacher = _sanitize(teacher[1:])
+    if " s. " in teacher_and_classroom:
+        teacher, classroom = teacher_and_classroom.split(" s. ")
+        teacher = teacher[1:]
+    else:
+        teacher = teacher_and_classroom
+        classroom = None
+    teacher = _sanitize(teacher)
     class_name = _sanitize(class_name)
     return class_name, classroom, teacher
 
