@@ -1,3 +1,4 @@
+from librusapi.token import Token
 from librusapi.urls import TIMETABLE_URL, HEADERS
 from librusapi.exceptions import AuthorizationError
 from requests import Session
@@ -7,6 +8,7 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from functools import total_ordering, cached_property
 from typing import Tuple, Optional, Iterator, Union
+from librusapi.helpers import sanitize
 
 
 class Week:
@@ -90,37 +92,30 @@ class LessonUnit:
         return Week(self.start)
 
 
-def _get_html(token: str, week: Week) -> str:
+def _get_html(token: Token, week: Week) -> str:
     s = Session()
     data = {"tydzien": str(week)}
-    cookies = {"DZIENNIKSID": token}
-    r = s.post(TIMETABLE_URL, data=data, cookies=cookies, headers=HEADERS)
-    r.raise_for_status()
-    return r.text
+    resp = token.post(TIMETABLE_URL, data)
+    return resp.text
 
 
 def _process_entry_text(et: Tag) -> Tuple[str, Optional[str], str]:
     """Process the 'text' part of a lesson unit html"""
-
-    def _sanitize(text):
-        """Remove all newlines and >1 spaces in a line of text"""
-        return " ".join(text.replace("\xa0", " ").replace("&nbsp", "").split())
-
     text_data = et.find_all(text=True)
     # remove unnecessary newlines found
     if len(text_data) == 4:
         del text_data[0]
         del text_data[1]
     class_name, teacher_and_classroom = text_data
-    teacher_and_classroom = _sanitize(teacher_and_classroom)
+    teacher_and_classroom = sanitize(teacher_and_classroom)
     if " s. " in teacher_and_classroom:
         teacher, classroom = teacher_and_classroom.split(" s. ")
         teacher = teacher[1:]
     else:
         teacher = teacher_and_classroom
         classroom = None
-    teacher = _sanitize(teacher)
-    class_name = _sanitize(class_name)
+    teacher = sanitize(teacher)
+    class_name = sanitize(class_name)
     return class_name, classroom, teacher
 
 
@@ -169,7 +164,7 @@ def _parse_html(html: str) -> Iterator[LessonUnit]:
 
 
 def lesson_units(
-    token: str, week: Optional[Union[datetime, Week]] = datetime.now()
+    token: Token, week: Optional[Union[datetime, Week]] = datetime.now()
 ) -> Iterator[LessonUnit]:
     """Generator for lesson units.
 
@@ -189,7 +184,7 @@ def lesson_units(
             unrelated to authenticaiton occurs.
         AuthorizationError: When authorization using the token fails.
     Example:
-    >>> lesson_units = lesson_units('TOKEN')
+    >>> lesson_units = lesson_units(token)
     >>> for lu in lesson_units:
     ...     print(lu.name, lu.teacher, lu.classroom, lu.info, lu.start, lu.duration, sep='\\n')
     ...     break

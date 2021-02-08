@@ -79,20 +79,32 @@ lesson_units = timetable.lesson_units(token)
 for lu in lesson_units:
     print(lu)
 </code></pre>
+<p>Listing messages
+~~~~~~~~~~~~~~~~</p>
+<div class="admonition code">
+<p class="admonition-title">Code:&ensp;python</p>
+<p>from librusapi.token import get_token
+from librusapi import messages</p>
+<p>token = get_token('username', 'password')
+messages = messages.list_messages(token)</p>
+<p>for msg in messages:
+print(msg)</p>
+</div>
 <h2 id="documentation">Documentation</h2>
 <p>Docs can be found <code>here &lt;https://ravensiris.github.io/librusapi/&gt;</code>_</p>
-<h2 id="working-on-the-project">Working on the project</h2>
-<p>.. code:: sh</p>
-<pre><code>git clone https://github.com/ravensiris/librusapi
+<h2 id="working-on-the-project">Working On The Project</h2>
+<div class="admonition code">
+<p class="admonition-title">Code:&ensp;sh</p>
+<p>git clone <a href="https://github.com/ravensiris/librusapi">https://github.com/ravensiris/librusapi</a>
 cd librusapi
-python -m venv venv
-# This may be different depending on your operating system and shell
-source ./venv/bin/activate
-pip install -r requirements.txt
-# Installing as an editable library
-pip install -e .
-</code></pre>
-<p>Now you can import <code>librusapi</code> in your project</p>
+python -m venv venv</p>
+<h1 id="this-may-be-different-depending-on-your-operating-system-and-shell">This may be different depending on your operating system and shell</h1>
+<p>source ./venv/bin/activate
+pip install -r requirements.txt</p>
+<h1 id="installing-as-an-editable-library">Installing as an editable library</h1>
+<p>pip install -e .</p>
+</div>
+<p>Now you can import <code><a title="librusapi" href="#librusapi">librusapi</a></code> in your project</p>
 <p>Generating docs
 ~~~~~~~~~~~~~~~</p>
 <div class="admonition code">
@@ -107,6 +119,9 @@ pip install -e .
 </li>
 <li>
 <p>List all lessons in a timetable</p>
+</li>
+<li>
+<p>List all messages ( can't read them yet )</p>
 </li>
 </ul>
 <details class="source">
@@ -129,6 +144,14 @@ for scraping the data
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="librusapi.exceptions" href="exceptions.html">librusapi.exceptions</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="librusapi.helpers" href="helpers.html">librusapi.helpers</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="librusapi.messages" href="messages.html">librusapi.messages</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -170,6 +193,8 @@ for scraping the data
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="librusapi.exceptions" href="exceptions.html">librusapi.exceptions</a></code></li>
+<li><code><a title="librusapi.helpers" href="helpers.html">librusapi.helpers</a></code></li>
+<li><code><a title="librusapi.messages" href="messages.html">librusapi.messages</a></code></li>
 <li><code><a title="librusapi.timetable" href="timetable.html">librusapi.timetable</a></code></li>
 <li><code><a title="librusapi.token" href="token.html">librusapi.token</a></code></li>
 <li><code><a title="librusapi.urls" href="urls.html">librusapi.urls</a></code></li>

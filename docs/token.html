@@ -29,11 +29,104 @@
 <pre><code class="python">from urllib.parse import urljoin
 from requests import Session
 from json import JSONDecodeError
+from requests.models import Response
+
+from requests.sessions import PreparedRequest
 from librusapi.exceptions import AuthorizationError
 import typing
 from typing import Dict
 from librusapi.urls import HEADERS
-from librusapi.urls import API_URLS
+from librusapi.urls import API_URLS, INDEX_URL
+from base64 import b64decode, b64encode
+from requests import Request
+import re
+
+
+class Token:
+    &#34;&#34;&#34;Combines all necessary functions to create
+    authenticated requests.
+
+    Can be retrieved using `get_token` function.
+    Or loaded from a base64 encoded string.
+
+    Attributes:
+        librus_token: DZIENNIKSID cookie
+        csrf_token: CSRF token, can be used for unlimited
+            amount of requests within a single session
+    &#34;&#34;&#34;
+
+    def __init__(self, token: str = None):
+        &#34;&#34;&#34;Load both Librus token and CSRF token from
+        base64 encoded string.
+
+        e.g. base64($librus_token + &#39;:&#39; + $csrf_token)
+
+        Args:
+            token: base64 encoded token. 
+                When is None sets all properties to an
+                empty string.
+        Raises:
+            ValueError: Whenever there are too many or too little
+                strings separated by a colon
+            binascii.Error: Whenever parsing base64 encoded string fails
+            UnicodeDecodeError: Whenever parsing token string from
+                binary to utf-8 fails
+        Example:
+        &gt;&gt;&gt; token = Token(&#39;THh4LXh4eHh4eHh4eHh4eHh4eHh4eHh\
+            4eHh4eHh4eHh4eHh4OkNTUkZUT0tFTjEyMzQ1Njc4OQ==&#39;)
+        &gt;&gt;&gt; print(token.librus_token)
+        Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        &gt;&gt;&gt; print(token.csrf_token)
+        CSRFTOKEN123456789
+        &#34;&#34;&#34;
+        self._session = Session()
+        if not token:
+            self.librus_token = &#34;&#34;
+            self.csrf_token = &#34;&#34;
+            return
+        token = b64decode(token).decode(&#34;utf-8&#34;)
+        librus_token, csrf_token = token.split(&#34;:&#34;)
+
+        self.librus_token = librus_token
+        &#34;&#34;&#34;DZIENNIKSID cookie&#34;&#34;&#34;
+        self.csrf_token = csrf_token
+        &#34;&#34;&#34;CSRF token, can be used for unlimited 
+        amount of requests within a single session&#34;&#34;&#34;
+
+    def __str__(self) -&gt; str:
+        combine = self.librus_token + &#34;:&#34; + self.csrf_token
+        return b64encode(combine.encode()).decode(&#34;utf-8&#34;)
+
+    def create_request(
+        self, method: str, url: str, data=None, files=None
+    ) -&gt; PreparedRequest:
+        headers = {
+            &#34;User-Agent&#34;: &#34;Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0&#34;
+        }
+        cookies = {&#34;DZIENNIKSID&#34;: self.librus_token}
+        if files:
+            files[&#34;requestkey&#34;] = (None, self.csrf_token)
+        return Request(
+            method, url, headers=headers, data=data, files=files, cookies=cookies
+        ).prepare()
+
+    def post_request(self, url: str, data=None, files=None) -&gt; PreparedRequest:
+        return self.create_request(&#34;POST&#34;, url, data, files)
+
+    def get_request(self, url: str) -&gt; PreparedRequest:
+        return self.create_request(&#34;GET&#34;, url)
+
+    def post(self, url: str, data=None, files=None) -&gt; Response:
+        req = self.post_request(url, data, files)
+        resp = self._session.send(req)
+        resp.raise_for_status()
+        return resp
+
+    def get(self, url: str) -&gt; Response:
+        req = self.get_request(url)
+        resp = self._session.send(req)
+        resp.raise_for_status()
+        return resp
 
 
 def get_token(login: str, password: str):
@@ -49,7 +142,7 @@ def get_token(login: str, password: str):
 
     Example:
     &gt;&gt;&gt; get_token(&#39;username&#39;, &#39;password&#39;)
-    Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    returns instance of Token()
     &#34;&#34;&#34;
     s = Session()
     s.headers = HEADERS
@@ -74,17 +167,25 @@ def get_token(login: str, password: str):
         error_messages = [e.get(&#34;message&#34;) for e in json.get(&#34;errors&#34;)]
         raise AuthorizationError(&#34;\n&#34;.join(error_messages))
 
-    if (goTo := json.get(&#34;goTo&#34;)):
+    if (goTo := json.get(&#34;goTo&#34;)) :
         s.get(urljoin(typing.cast(str, API_URLS[&#34;base_api&#34;]), goTo))
+        resp = s.get(INDEX_URL)
     else:
         raise AuthorizationError(&#34;&#39;goTo&#39; was not provided in the response JSON&#34;)
 
     cookies = s.cookies.get_dict()
-
     try:
-        return cookies[&#34;DZIENNIKSID&#34;]
+        librus_token = cookies[&#34;DZIENNIKSID&#34;]
     except KeyError:
-        raise AuthorizationError(f&#34;This should not happen. Cookies: {cookies}&#34;)</code></pre>
+        raise AuthorizationError(f&#34;This should not happen. Cookies: {cookies}&#34;)
+    token = Token()
+    token.librus_token = librus_token
+    token.csrf_token = &#34;&#34;
+    matches = re.search(r&#39;(?&lt;=csrfTokenValue = &#34;).*(?=&#34;)&#39;, resp.text)
+    if not matches:
+        raise AuthorizationError(&#34;CSRF token not found on Librus index page&#34;)
+    token.csrf_token = matches.group(0)
+    return token</code></pre>
 </details>
 </section>
 <section>
@@ -115,7 +216,7 @@ def get_token(login: str, password: str):
 </dl>
 <p>Example:</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; get_token('username', 'password')
-Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+returns instance of Token()
 </code></pre></div>
 <details class="source">
 <summary>
@@ -134,7 +235,7 @@ Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     Example:
     &gt;&gt;&gt; get_token(&#39;username&#39;, &#39;password&#39;)
-    Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    returns instance of Token()
     &#34;&#34;&#34;
     s = Session()
     s.headers = HEADERS
@@ -159,22 +260,265 @@ Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         error_messages = [e.get(&#34;message&#34;) for e in json.get(&#34;errors&#34;)]
         raise AuthorizationError(&#34;\n&#34;.join(error_messages))
 
-    if (goTo := json.get(&#34;goTo&#34;)):
+    if (goTo := json.get(&#34;goTo&#34;)) :
         s.get(urljoin(typing.cast(str, API_URLS[&#34;base_api&#34;]), goTo))
+        resp = s.get(INDEX_URL)
     else:
         raise AuthorizationError(&#34;&#39;goTo&#39; was not provided in the response JSON&#34;)
 
     cookies = s.cookies.get_dict()
-
     try:
-        return cookies[&#34;DZIENNIKSID&#34;]
+        librus_token = cookies[&#34;DZIENNIKSID&#34;]
     except KeyError:
-        raise AuthorizationError(f&#34;This should not happen. Cookies: {cookies}&#34;)</code></pre>
+        raise AuthorizationError(f&#34;This should not happen. Cookies: {cookies}&#34;)
+    token = Token()
+    token.librus_token = librus_token
+    token.csrf_token = &#34;&#34;
+    matches = re.search(r&#39;(?&lt;=csrfTokenValue = &#34;).*(?=&#34;)&#39;, resp.text)
+    if not matches:
+        raise AuthorizationError(&#34;CSRF token not found on Librus index page&#34;)
+    token.csrf_token = matches.group(0)
+    return token</code></pre>
 </details>
 </dd>
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="librusapi.token.Token"><code class="flex name class">
+<span>class <span class="ident">Token</span></span>
+<span>(</span><span>token: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Combines all necessary functions to create
+authenticated requests.</p>
+<p>Can be retrieved using <code><a title="librusapi.token.get_token" href="#librusapi.token.get_token">get_token()</a></code> function.
+Or loaded from a base64 encoded string.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>librus_token</code></strong></dt>
+<dd>DZIENNIKSID cookie</dd>
+<dt><strong><code>csrf_token</code></strong></dt>
+<dd>CSRF token, can be used for unlimited
+amount of requests within a single session</dd>
+</dl>
+<p>Load both Librus token and CSRF token from
+base64 encoded string.</p>
+<p>e.g. base64($librus_token + ':' + $csrf_token)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>token</code></strong></dt>
+<dd>base64 encoded token.
+When is None sets all properties to an
+empty string.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Whenever there are too many or too little
+strings separated by a colon</dd>
+<dt><code>binascii.Error</code></dt>
+<dd>Whenever parsing base64 encoded string fails</dd>
+<dt><code>UnicodeDecodeError</code></dt>
+<dd>Whenever parsing token string from
+binary to utf-8 fails</dd>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; token = Token('THh4LXh4eHh4eHh4eHh4eHh4eHh4eHh            4eHh4eHh4eHh4eHh4OkNTUkZUT0tFTjEyMzQ1Njc4OQ==')
+&gt;&gt;&gt; print(token.librus_token)
+Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+&gt;&gt;&gt; print(token.csrf_token)
+CSRFTOKEN123456789
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Token:
+    &#34;&#34;&#34;Combines all necessary functions to create
+    authenticated requests.
+
+    Can be retrieved using `get_token` function.
+    Or loaded from a base64 encoded string.
+
+    Attributes:
+        librus_token: DZIENNIKSID cookie
+        csrf_token: CSRF token, can be used for unlimited
+            amount of requests within a single session
+    &#34;&#34;&#34;
+
+    def __init__(self, token: str = None):
+        &#34;&#34;&#34;Load both Librus token and CSRF token from
+        base64 encoded string.
+
+        e.g. base64($librus_token + &#39;:&#39; + $csrf_token)
+
+        Args:
+            token: base64 encoded token. 
+                When is None sets all properties to an
+                empty string.
+        Raises:
+            ValueError: Whenever there are too many or too little
+                strings separated by a colon
+            binascii.Error: Whenever parsing base64 encoded string fails
+            UnicodeDecodeError: Whenever parsing token string from
+                binary to utf-8 fails
+        Example:
+        &gt;&gt;&gt; token = Token(&#39;THh4LXh4eHh4eHh4eHh4eHh4eHh4eHh\
+            4eHh4eHh4eHh4eHh4OkNTUkZUT0tFTjEyMzQ1Njc4OQ==&#39;)
+        &gt;&gt;&gt; print(token.librus_token)
+        Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        &gt;&gt;&gt; print(token.csrf_token)
+        CSRFTOKEN123456789
+        &#34;&#34;&#34;
+        self._session = Session()
+        if not token:
+            self.librus_token = &#34;&#34;
+            self.csrf_token = &#34;&#34;
+            return
+        token = b64decode(token).decode(&#34;utf-8&#34;)
+        librus_token, csrf_token = token.split(&#34;:&#34;)
+
+        self.librus_token = librus_token
+        &#34;&#34;&#34;DZIENNIKSID cookie&#34;&#34;&#34;
+        self.csrf_token = csrf_token
+        &#34;&#34;&#34;CSRF token, can be used for unlimited 
+        amount of requests within a single session&#34;&#34;&#34;
+
+    def __str__(self) -&gt; str:
+        combine = self.librus_token + &#34;:&#34; + self.csrf_token
+        return b64encode(combine.encode()).decode(&#34;utf-8&#34;)
+
+    def create_request(
+        self, method: str, url: str, data=None, files=None
+    ) -&gt; PreparedRequest:
+        headers = {
+            &#34;User-Agent&#34;: &#34;Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0&#34;
+        }
+        cookies = {&#34;DZIENNIKSID&#34;: self.librus_token}
+        if files:
+            files[&#34;requestkey&#34;] = (None, self.csrf_token)
+        return Request(
+            method, url, headers=headers, data=data, files=files, cookies=cookies
+        ).prepare()
+
+    def post_request(self, url: str, data=None, files=None) -&gt; PreparedRequest:
+        return self.create_request(&#34;POST&#34;, url, data, files)
+
+    def get_request(self, url: str) -&gt; PreparedRequest:
+        return self.create_request(&#34;GET&#34;, url)
+
+    def post(self, url: str, data=None, files=None) -&gt; Response:
+        req = self.post_request(url, data, files)
+        resp = self._session.send(req)
+        resp.raise_for_status()
+        return resp
+
+    def get(self, url: str) -&gt; Response:
+        req = self.get_request(url)
+        resp = self._session.send(req)
+        resp.raise_for_status()
+        return resp</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="librusapi.token.Token.csrf_token"><code class="name">var <span class="ident">csrf_token</span></code></dt>
+<dd>
+<div class="desc"><p>CSRF token, can be used for unlimited
+amount of requests within a single session</p></div>
+</dd>
+<dt id="librusapi.token.Token.librus_token"><code class="name">var <span class="ident">librus_token</span></code></dt>
+<dd>
+<div class="desc"><p>DZIENNIKSID cookie</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="librusapi.token.Token.create_request"><code class="name flex">
+<span>def <span class="ident">create_request</span></span>(<span>self, method: str, url: str, data=None, files=None) ‑> requests.models.PreparedRequest</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_request(
+    self, method: str, url: str, data=None, files=None
+) -&gt; PreparedRequest:
+    headers = {
+        &#34;User-Agent&#34;: &#34;Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0&#34;
+    }
+    cookies = {&#34;DZIENNIKSID&#34;: self.librus_token}
+    if files:
+        files[&#34;requestkey&#34;] = (None, self.csrf_token)
+    return Request(
+        method, url, headers=headers, data=data, files=files, cookies=cookies
+    ).prepare()</code></pre>
+</details>
+</dd>
+<dt id="librusapi.token.Token.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self, url: str) ‑> requests.models.Response</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self, url: str) -&gt; Response:
+    req = self.get_request(url)
+    resp = self._session.send(req)
+    resp.raise_for_status()
+    return resp</code></pre>
+</details>
+</dd>
+<dt id="librusapi.token.Token.get_request"><code class="name flex">
+<span>def <span class="ident">get_request</span></span>(<span>self, url: str) ‑> requests.models.PreparedRequest</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_request(self, url: str) -&gt; PreparedRequest:
+    return self.create_request(&#34;GET&#34;, url)</code></pre>
+</details>
+</dd>
+<dt id="librusapi.token.Token.post"><code class="name flex">
+<span>def <span class="ident">post</span></span>(<span>self, url: str, data=None, files=None) ‑> requests.models.Response</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def post(self, url: str, data=None, files=None) -&gt; Response:
+    req = self.post_request(url, data, files)
+    resp = self._session.send(req)
+    resp.raise_for_status()
+    return resp</code></pre>
+</details>
+</dd>
+<dt id="librusapi.token.Token.post_request"><code class="name flex">
+<span>def <span class="ident">post_request</span></span>(<span>self, url: str, data=None, files=None) ‑> requests.models.PreparedRequest</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def post_request(self, url: str, data=None, files=None) -&gt; PreparedRequest:
+    return self.create_request(&#34;POST&#34;, url, data, files)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -191,6 +535,22 @@ Lxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="librusapi.token.get_token" href="#librusapi.token.get_token">get_token</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="librusapi.token.Token" href="#librusapi.token.Token">Token</a></code></h4>
+<ul class="two-column">
+<li><code><a title="librusapi.token.Token.create_request" href="#librusapi.token.Token.create_request">create_request</a></code></li>
+<li><code><a title="librusapi.token.Token.csrf_token" href="#librusapi.token.Token.csrf_token">csrf_token</a></code></li>
+<li><code><a title="librusapi.token.Token.get" href="#librusapi.token.Token.get">get</a></code></li>
+<li><code><a title="librusapi.token.Token.get_request" href="#librusapi.token.Token.get_request">get_request</a></code></li>
+<li><code><a title="librusapi.token.Token.librus_token" href="#librusapi.token.Token.librus_token">librus_token</a></code></li>
+<li><code><a title="librusapi.token.Token.post" href="#librusapi.token.Token.post">post</a></code></li>
+<li><code><a title="librusapi.token.Token.post_request" href="#librusapi.token.Token.post_request">post_request</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -5,6 +5,7 @@
   - [[#development-specific][Development specific]]
 - [[#quick-start][Quick start]]
   - [[#getting-the-timetable][Getting the timetable]]
+  - [[#listing-messages][Listing messages]]
 - [[#documentation][Documentation]]
 - [[#working-on-the-project][Working on the project]]
   - [[#generating-docs][Generating docs]]
@@ -44,6 +45,18 @@ refresh every *3h* or so.
         print(lu)
   #+end_src
 
+** Listing messages
+  #+begin_src python
+    from librusapi.token import get_token
+    from librusapi import messages
+
+    token = get_token('username', 'password')
+    messages = messages.list_messages(token)
+
+    for msg in messages:
+        print(msg)
+  #+end_src
+
 * Documentation
 
 Docs can be found [[https://ravensiris.github.io/librusapi/][here]]
@@ -76,4 +89,5 @@ Currenty you can:
 
 - Authenticate and get a token
 - List all lessons in a timetable
+- List all messages ( can't read them yet )
 
