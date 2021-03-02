@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 from librusapi.token import Token
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, Tuple
 
-from requests.sessions import Session, Request
+import deprecation
 from librusapi.urls import MESSAGES_URL
 from librusapi.helpers import sanitize
 
@@ -64,6 +64,7 @@ def _message_list_get_html(token: Token, page: int) -> str:
 @dataclass
 class PageInfo:
     """Stores page related information for paginated requests"""
+
     current: int
     max_page: int
 
@@ -94,6 +95,54 @@ def _parse_message_briefs(doc: BeautifulSoup) -> Iterator[MessageBrief]:
         yield MessageBrief(id, title, sender, sent, has_attachment, is_read)
 
 
+@dataclass
+class MessagesPage:
+    """List of messages with page metadata
+
+    Attributes:
+        messages: Iterator for `MessageBrief`
+        page: Current page
+        total_pages: Pages in total"""
+
+    messages: Iterator[MessageBrief]
+    __page_info: PageInfo
+
+    @property
+    def page(self) -> int:
+        """Current page"""
+        return self.__page_info.current
+
+    @property
+    def total_pages(self) -> int:
+        """Pages in total"""
+        return self.__page_info.max_page + 1
+
+
+def get_page(token: Token, page: int):
+    """Gets a page of messages from Librus.
+
+    Args:
+        token: Librus token.
+        page: Message page.
+    Returns:
+        `MessagePage`: Single page of messages with metadata.
+    Raises:
+        requests.exceptions.HTTPError: When an error that is
+            unrelated to authenticaiton occurs.
+        AuthorizationError: When authorization using the token fails.
+        IndexError: When page is out of bounds
+    """
+    html = _message_list_get_html(token, page)
+    doc = BeautifulSoup(html, features="lxml")
+    info = _parse_message_page_info(doc)
+    if info.current != page:
+        raise IndexError(f"Page doesn't exist! Max page: {info.max_page}")
+    msgs = _parse_message_briefs(doc)
+    messages_page = MessagesPage(msgs, info)
+    return messages_page
+
+
+@deprecation.deprecated(details="Use get_page instead")
 def list_messages(token: Token, page: int) -> Tuple[PageInfo, Iterator[MessageBrief]]:
     """Generator for `MessageBrief`
 

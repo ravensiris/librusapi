@@ -15,6 +15,7 @@ def test_lesson_units(token):
     r = list(r)
     assert len(r) > 0
 
+
 def test_all_weeks(token):
     now = datetime.now()
     year = now.year if now.month >= 9 else now.year - 1
