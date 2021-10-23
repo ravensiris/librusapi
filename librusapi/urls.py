@@ -22,6 +22,7 @@ API_URLS = {
             baseauth,
             "Authorization?" + "&".join([client_id, response_type, scope]),
         ),
+        "captcha": urljoin(baseapi, "/OAuth/Captcha"),
         "authorization": urljoin(baseauth, "Authorization?" + client_id),
         "grant": urljoin(baseauth, "Authorization/Grant?" + client_id),
     },

@@ -69,7 +69,10 @@ class PageInfo:
 
 
 def _parse_message_page_info(doc: BeautifulSoup) -> PageInfo:
-    elem = doc.find("div", class_="pagination").find("span")
+    try:
+        elem = doc.find("div", class_="pagination").find("span")
+    except AttributeError:
+        return PageInfo(0, 0)
     pagination_desc = sanitize(elem.text)
     match = re.findall("[0-9][^ ]*", pagination_desc)
     current = int(match[0]) - 1

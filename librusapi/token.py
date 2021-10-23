@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 from requests import Session
 from json import JSONDecodeError
 from requests.models import Response
+import requests
 
 from requests.sessions import PreparedRequest
 from librusapi.exceptions import AuthorizationError
@@ -22,12 +23,12 @@ class Token:
     Or loaded from a base64 encoded string.
 
     Attributes:
-        librus_token: DZIENNIKSID cookie
+        librus_token: SDZIENNIKSID cookie
         csrf_token: CSRF token, can be used for unlimited
             amount of requests within a single session
     """
 
-    def __init__(self, token: str = None):
+    def __init__(self, session, csrf_token):
         """Load both Librus token and CSRF token from
         base64 encoded string.
 
@@ -51,19 +52,8 @@ class Token:
         >>> print(token.csrf_token)
         CSRFTOKEN123456789
         """
-        self._session = Session()
-        if not token:
-            self.librus_token = ""
-            self.csrf_token = ""
-            return
-        token = b64decode(token).decode("utf-8")
-        librus_token, csrf_token = token.split(":")
-
-        self.librus_token = librus_token
-        """DZIENNIKSID cookie"""
+        self._session = session
         self.csrf_token = csrf_token
-        """CSRF token, can be used for unlimited 
-        amount of requests within a single session"""
 
     def __str__(self) -> str:
         combine = self.librus_token + ":" + self.csrf_token
@@ -75,11 +65,10 @@ class Token:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0"
         }
-        cookies = {"DZIENNIKSID": self.librus_token}
         if files:
             files["requestkey"] = (None, self.csrf_token)
         return Request(
-            method, url, headers=headers, data=data, files=files, cookies=cookies
+            method, url, headers=headers, data=data, files=files, cookies=self._session.cookies
         ).prepare()
 
     def post_request(self, url: str, data=None, files=None) -> PreparedRequest:
@@ -100,15 +89,14 @@ class Token:
         resp.raise_for_status()
         return resp
 
-
 def get_token(login: str, password: str):
-    """Get DZIENNIKSID cookie that acts as an authorization token.
+    """Get SDZIENNIKSID cookie that acts as an authorization token.
 
     Args:
         login: Full Librus username.
         password: Librus password.
     Returns:
-        string DZIENNIKSID cookie.
+        string SDZIENNIKSID cookie.
     Raises:
         AuthorizationError: Whenever anything fails.
 
@@ -123,6 +111,14 @@ def get_token(login: str, password: str):
             str, typing.cast(Dict[str, dict], API_URLS["auth"])["handshake"]
         )
     )
+    resp = s.post(
+        url=typing.cast(
+            str, typing.cast(Dict[str, dict], API_URLS["auth"])["captcha"]
+        ),
+        data={"username": login, "is_needed": "1"}
+    )
+    # Captcha on librus is easy to bypass for now
+    resp.raise_for_status()
     resp = s.post(
         typing.cast(
             str, typing.cast(Dict[str, dict], API_URLS["auth"])["authorization"]
@@ -139,22 +135,26 @@ def get_token(login: str, password: str):
         error_messages = [e.get("message") for e in json.get("errors")]
         raise AuthorizationError("\n".join(error_messages))
 
-    if (goTo := json.get("goTo")) :
-        s.get(urljoin(typing.cast(str, API_URLS["base_api"]), goTo))
-        resp = s.get(INDEX_URL)
+    if (goTo := json.get("goTo")):
+        url = urljoin(typing.cast(str, API_URLS["base_api"]), goTo)
+        s.get(url)
     else:
         raise AuthorizationError("'goTo' was not provided in the response JSON")
 
+    try:
+        resp = s.get(INDEX_URL)
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise AuthorizationError("Auth failed at the last step")
+
     cookies = s.cookies.get_dict()
     try:
-        librus_token = cookies["DZIENNIKSID"]
+        librus_token = cookies["SDZIENNIKSID"]
+        device_token = cookies["DeviceCookie"]
     except KeyError:
         raise AuthorizationError(f"This should not happen. Cookies: {cookies}")
-    token = Token()
-    token.librus_token = librus_token
-    token.csrf_token = ""
     matches = re.search(r'(?<=csrfTokenValue = ").*(?=")', resp.text)
     if not matches:
         raise AuthorizationError("CSRF token not found on Librus index page")
-    token.csrf_token = matches.group(0)
-    return token
+    csrf_token = matches.group(0)
+    return Token(s, csrf_token)
